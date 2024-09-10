@@ -16,6 +16,11 @@
     "tailwindcss": "^3.4.10"
   },
   "dependencies": {
-    "express": "^4.20.0"
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "express": "^4.20.0",
+    "lucide-react": "^0.439.0",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss-animate": "^1.0.7"
   }
 }
