@@ -18,9 +18,13 @@
   "dependencies": {
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "express": "^4.20.0",
+    "express": "^4.21.0",
     "lucide-react": "^0.439.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7"
-  }
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "type": "module"
 }

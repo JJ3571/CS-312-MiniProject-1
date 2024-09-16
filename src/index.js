@@ -1,14 +1,21 @@
-const express = require('express');
+import express from "express";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 const app = express();
 
-const PORT = 9000;
-
+const PORT = 3000;
 
 app.get('/', (req, res) => {
-    res.json({ message: 'Hello World' });
+    res.sendFile(__dirname + '/public/index.html');
 });
 
-app.listen(9000, () => {
-    console.log('Server is running on port 9000');
+app.get('/about', (req, res) => {  
+    res.send('<h1 style="color: blue; font-size: 80px;">Hello Adri</h1>');
+});
+
+app.listen(3000, () => {
+    console.log('Server is running on port 3000');
 });
 
