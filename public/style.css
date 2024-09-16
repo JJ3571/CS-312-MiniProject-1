@@ -1,0 +1,76 @@
+/* General Styles */
+body {
+    font-family: sans-serif;
+    background-color: #222; 
+    color: #eee; 
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333;
+    padding: 20px;
+    text-align: left;
+}
+
+h1 {
+    color: #3195ff; 
+    margin-bottom: 10px;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav a {
+    color: #eee;
+    text-decoration: none;
+}
+
+main {
+    padding: 20px;
+}
+
+article {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #333;
+    border-radius: 10px; 
+}
+
+h2 {
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+footer {
+    background-color: #333;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Form Styles */
+input[type="text"],
+input[type="email"],
+textarea,
+button {
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #555;
+    border-radius: 5px; /* Rounded corners for form elements */
+    background-color: #333;
+    color: #eee;
+}
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+}

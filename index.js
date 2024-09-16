@@ -9,6 +9,7 @@ const port = 3000;
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use(express.static(__dirname + '/public'));
 
 
 
@@ -36,9 +37,18 @@ app.get('/about', (req, res) => {
 
 
 // --- Request Handling ---
-app.post('/submit', (req, res) => {
+var form_test = "";
+
+function formgenerator(req, res, next) {
     console.log(req.body);
-    res.send('Data received');
+    form_test = req.body['street'] + req.body['pet'];
+    next();
+};
+
+app.use(formgenerator);
+
+app.post('/submit', (req, res, next) => {
+    res.send(`<h1>Your form was received!$ {form_test}</h1>`);
 });
 
 
