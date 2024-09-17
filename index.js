@@ -25,30 +25,37 @@ app.use(morgan("tiny"));
 
 
 
+// --- EJS Rendering & Templates ---
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views');
+
+
+
 // --- Page Routes ---
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
-});
-
-app.get('/about', (req, res) => {  
-    res.send('<h1 style="color: blue; font-size: 80px;">Hi, my name is Jarred</h1>');
+    res.render('index', { blogPosts: blogPosts });
 });
 
 
 
-// --- Request Handling ---
-var form_test = "";
+// --- Blog Post Handling ---
+let blogPosts = []
 
-function formgenerator(req, res, next) {
-    console.log(req.body);
-    form_test = req.body['street'] + req.body['pet'];
-    next();
+function addToBlogArray(req, res) {
+    const newPost = {
+        title: req.body.title,
+        date: new Date().toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }).replace(/,/g, ''),
+        category: req.body.category,
+        content: req.body.content
+    };
+    blogPosts.push(newPost);
+    res.redirect('/')
 };
 
-app.use(formgenerator);
 
 app.post('/submit', (req, res, next) => {
-    res.send(`<h1>Your form was received!$ {form_test}</h1>`);
+    console.log("Post recorded. Form data: " + req.body.title + " " + req.body.category + " " + req.body.content);
+    addToBlogArray(req, res);
 });
 
 

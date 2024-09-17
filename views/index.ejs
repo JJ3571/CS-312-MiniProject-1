@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Blog</title>
+    <link rel="stylesheet" href="style.css">
+    <title>CS312 MiniProjet 1 - Blog</title>
+<body>
+    <header>
+        <h1>Welcome to Jarred's Blog</h1>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="/about">Find a Friend</a></li>
+            </ul>
+        </nav>
+    </header>
+
+        <form action="/submit" method="POST">
+            <input type="text" name="title" placeholder="Title">
+            <select name="category" id="category" placeholder="category">
+                <option value="Life">Life</option>
+                <option value="Tech">Tech</option>
+                <option value="Food">Food</option>
+                <option value="Travel">Travel</option>
+                <option value="Sports">Sports</option>
+            </select>
+            <textarea name="content" placeholder="Content"></textarea>
+            <button type="submit">Submit</button>
+        </form>
+
+
+    <% blogPosts.forEach(post => { %>
+        <h2><%= post.title %></h2>
+        <h4>Category: <%= post.category %></h4>
+        <h4><%= post.date %></h4>
+        <p><%- post.content.replace(/\n/g, "<br>") %></p>
+    <% }); %>
+
+
+    <footer></footer>
+        <p> Jarred Dunlap&trade; <br>CS312 - MiniProject 1</p>
+    </footer>
+</body>
+</html>
