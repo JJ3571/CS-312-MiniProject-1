@@ -36,6 +36,11 @@ app.get('/', (req, res) => {
     res.render('index', { blogPosts: blogPosts });
 });
 
+app.post('/submit', (req, res, next) => {
+    console.log("Post recorded.\nTitle: " + req.body.title + "\nCategory: " + req.body.category + "\nPost ID: " + blogPostCounter);
+    addToBlogArray(req, res);
+});
+
 app.get('/edit/:id', (req, res) => {
     const postId = req.params.id;
     const post = blogPosts[postId];
@@ -80,11 +85,6 @@ function addToBlogArray(req, res) {
     blogPosts.push(newPost);
     res.redirect('/')
 };
-
-app.post('/submit', (req, res, next) => {
-    console.log("Post recorded.\nTitle: " + req.body.title + "\nCategory: " + req.body.category + "\nPost ID: " + blogPostCounter);
-    addToBlogArray(req, res);
-});
 
 
 
