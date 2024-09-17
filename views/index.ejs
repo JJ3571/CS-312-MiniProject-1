@@ -30,10 +30,17 @@
 
 
     <% blogPosts.forEach(post => { %>
-        <h2><%= post.title %></h2>
-        <h4>Category: <%= post.category %></h4>
-        <h4><%= post.date %></h4>
-        <p><%- post.content.replace(/\n/g, "<br>") %></p>
+        <div class="blog-post">
+            <h2><%= post.title %></h2>
+            <h4><%= post.date %></h4>
+            <h4>Category: <%= post.category %></h4>
+            <p><%- post.content.replace(/\n/g, "<br>") %></p>
+            <form action="/edit/<%= post.id %>" method="GET">
+                <button type="submit">Edit Post</button>
+            </form>
+            <form action="/delete/<%= post.id %>" method="GET">
+                <button type="submit">Delete Post</button>
+        </div>
     <% }); %>
 
 

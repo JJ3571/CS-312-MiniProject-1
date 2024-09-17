@@ -36,31 +36,59 @@ app.get('/', (req, res) => {
     res.render('index', { blogPosts: blogPosts });
 });
 
+app.get('/edit/:id', (req, res) => {
+    const postId = req.params.id;
+    const post = blogPosts[postId];
+    res.render('edit', { postId, post });
+
+    console.log("Post edited. Post ID: " + postId);
+});
+
+app.post('/update/:id', (req, res) => {
+    const postId = req.params.id;
+    const post = blogPosts[postId];
+    post.title = req.body.title;
+    post.category = req.body.category;
+    post.content = req.body.content;
+    res.redirect('/');
+
+    console.log("Post updated. Post ID: " + postId);
+});
+
+app.get('/delete/:id', (req, res) => {
+    const postId = req.params.id;
+    blogPosts = blogPosts.filter(post => post.id != postId); // Stack Overflow solution (ECMA-262 Edition 5 code AKA old style JavaScript)
+    res.redirect('/');
+
+    console.log("Post deleted. Post ID: " + postId);
+});
+
 
 
 // --- Blog Post Handling ---
 let blogPosts = []
+let blogPostCounter = 0;
 
 function addToBlogArray(req, res) {
     const newPost = {
         title: req.body.title,
-        date: new Date().toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }).replace(/,/g, ''),
+        date: new Date().toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }).replace(/,/g, ''),
         category: req.body.category,
-        content: req.body.content
+        content: req.body.content,
+        id: blogPostCounter++
     };
     blogPosts.push(newPost);
     res.redirect('/')
 };
 
-
 app.post('/submit', (req, res, next) => {
-    console.log("Post recorded. Form data: " + req.body.title + " " + req.body.category + " " + req.body.content);
+    console.log("Post recorded.\nTitle: " + req.body.title + "\nCategory: " + req.body.category + "\nPost ID: " + blogPostCounter);
     addToBlogArray(req, res);
 });
 
 
 
-// --- Express/Nodemon Status ---
+// --- Server Start ---
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
