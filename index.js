@@ -25,6 +25,7 @@ dotenv.config();
 const DB_PASSWORD = process.env.DB_PASSWORD;
 
 
+
 // --- Sessions for user auth ---
 app.use(session({
     secret: 'apAPS*RcU^o2MjonW%9i', 
@@ -32,6 +33,7 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false }
 }));
+
 
 
 // --- Database Setup ---
@@ -57,6 +59,8 @@ app.get('/', async (req, res) => {
     const result = await db.query('SELECT * FROM blogs');
     res.render('index', { blogPosts: result.rows, user: req.session.user });
 });
+
+
 
 // --- User Auth routes ---
 app.get('/signup', (req, res) => {
@@ -98,7 +102,6 @@ app.get('/logout', (req, res) => {
     });
 });
 
-
 app.post('/submit', async (req, res) => {
     const { title, body } = req.body;
     const creator_name = req.session.user.name;
@@ -119,14 +122,12 @@ app.get('/edit/:id', async (req, res) => {
     }
 });
 
-
 app.post('/edit/:id', async (req, res) => {
     const postId = req.params.id;
     const { title, body } = req.body;
     await db.query('UPDATE blogs SET title = $1, body = $2 WHERE blog_id = $3', [title, body, postId]);
     res.redirect('/');
 });
-
 
 app.get('/delete/:id', async (req, res) => {
     const postId = req.params.id;
@@ -164,4 +165,3 @@ function addToBlogArray(req, res) {
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
-

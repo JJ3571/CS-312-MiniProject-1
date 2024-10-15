@@ -18,21 +18,6 @@ h1 {
     margin-bottom: 10px;
 }
 
-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-nav li {
-    display: inline;
-    margin-right: 20px;
-}
-
-nav a {
-    color: #eee;
-    text-decoration: none;
-}
 
 main {
     padding: 20px;
@@ -142,4 +127,24 @@ textarea {
 
 .btn-link:hover {
     background-color: #0056b3;
+}
+
+/* Card styles */
+.card {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    margin: 0 0 10px 0;
+}
+
+.card-text {
+    margin: 0 0 10px 0;
 }

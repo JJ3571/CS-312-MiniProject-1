@@ -6,15 +6,15 @@
     <title>CS312 - Blog & Databases</title>
 <body>
  <div class="container">
-        <header class="d-flex justify-content-between align-items-center my-4">
+        <header>
             <h1>CS312 - Blog & Databases</h1>
             <div>
                 <% if (user) { %>
                     <span>Welcome, <%= user.name %>!</span>
-                    <a href="/logout" class="btn btn-outline-danger ml-2">Logout</a>
+                    <a href="/logout" class="btn">Logout</a>
                 <% } else { %>
-                    <a href="/signin" class="btn btn-outline-primary">Login</a>
-                    <a href="/signup" class="btn btn-outline-secondary ml-2">Sign Up</a>
+                    <a href="/signin" class="btn">Login</a>
+                    <a href="/signup" class="btn">Sign Up</a>
                 <% } %>
             </div>
         </header>
@@ -27,16 +27,16 @@
             </form>
         </div>
 
-        <div class="mt-4">
-            <% blogPosts.forEach(post => { %>
-                <div class="card mb-3">
+        <div>
+           <% blogPosts.forEach(post => { %>
+                <div class="card">
                     <div class="card-body">
                         <h2 class="card-title"><%= post.title %></h2>
                         <p class="card-text"><%= post.body %></p>
-                        <p class="card-text"><small class="text-muted">By: <%= post.creator_name %> on <%= post.date_created %></p>
+                        <p class="card-text"><small class="text-muted">By: <%= post.creator_name %> on <%= post.date_created %></small></p>
                         <% if (user && user.user_id === post.creator_user_id) { %>
-                            <a href="/edit/<%= post.blog_id %>" class="btn btn-outline-warning">Edit</a>
-                            <a href="/delete/<%= post.blog_id %>" class="btn btn-outline-danger">Delete</a>
+                            <a href="/edit/<%= post.blog_id %>" class="btn">Edit</a>
+                            <a href="/delete/<%= post.blog_id %>" class="btn">Delete</a>
                         <% } %>
                     </div>
                 </div>
