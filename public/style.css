@@ -124,3 +124,22 @@ textarea {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
     background-color: #363636; 
 }
+
+/* Styles for links */
+.btn {
+    cursor: pointer;
+    border-radius: 3px;
+    border: none;
+    display: inline-block;
+    padding: 10px 20px;
+    margin-left: 10px;
+    text-decoration: none;
+    color: white;
+    background-color: #007bff;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.btn-link:hover {
+    background-color: #0056b3;
+}

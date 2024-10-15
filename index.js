@@ -1,27 +1,48 @@
-// --- Express Setup ---
+// --- Imports ---
 import express from "express";
+import bodyparser from "body-parser";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import morgan from "morgan";
+import dotenv from "dotenv";
+import session from "express-session";
+import pg from "pg";
+
+
+
+// --- Express Setup ---
 const app = express();
 const port = 3000;
 
 
 
-// --- Directory/Path Setup ---
-import { dirname } from "path";
-import { fileURLToPath } from "url";
+// --- Middlewares (dirname, Body Parser, Morgan, .env) ---
 const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(__dirname + '/public'));
-
-
-
-// --- Body Parser Setup ---
-import bodyparser from "body-parser";
 app.use(bodyparser.urlencoded({ extended: true }));
-
-
-
-// --- Morgan Setup ---
-import morgan from "morgan";
 app.use(morgan("tiny"));
+dotenv.config();
+const DB_PASSWORD = process.env.DB_PASSWORD;
+
+
+// --- Sessions for user auth ---
+app.use(session({
+    secret: 'apAPS*RcU^o2MjonW%9i', 
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}));
+
+
+// --- Database Setup ---
+const db = new pg.Client({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'world',
+    password: DB_PASSWORD,
+    port: 5432,
+});
+db.connect();
 
 
 
@@ -32,40 +53,91 @@ app.set('views', __dirname + '/views');
 
 
 // --- Page Routes ---
-app.get('/', (req, res) => {
-    res.render('index', { blogPosts: blogPosts });
+app.get('/', async (req, res) => {
+    const result = await db.query('SELECT * FROM blogs');
+    res.render('index', { blogPosts: result.rows, user: req.session.user });
 });
 
-app.post('/submit', (req, res, next) => {
-    console.log("Post recorded.\nTitle: " + req.body.title + "\nCategory: " + req.body.category + "\nPost ID: " + blogPostCounter);
-    addToBlogArray(req, res);
+// --- User Auth routes ---
+app.get('/signup', (req, res) => {
+    res.render('signup');
 });
 
-app.get('/edit/:id', (req, res) => {
-    const postId = req.params.id;
-    const post = blogPosts[postId];
-    res.render('edit', { postId, post });
-
-    console.log("Post edited. Post ID: " + postId);
+app.post('/signup', async (req, res) => {
+    const { user_id, password, name } = req.body;
+    const userExists = await db.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
+    if (userExists.rows.length > 0) {
+        res.send('User ID already taken. Please choose another.');
+    } else {
+        await db.query('INSERT INTO users (user_id, password, name) VALUES ($1, $2, $3)', [user_id, password, name]);
+        res.redirect('/signin');
+    }
 });
 
-app.post('/update/:id', (req, res) => {
-    const postId = req.params.id;
-    const post = blogPosts[postId];
-    post.title = req.body.title;
-    post.category = req.body.category;
-    post.content = req.body.content;
+app.get('/signin', (req, res) => {
+    res.render('signin');
+});
+
+app.post('/signin', async (req, res) => {
+    const { user_id, password } = req.body;
+    const user = await db.query('SELECT * FROM users WHERE user_id = $1 AND password = $2', [user_id, password]);
+    if (user.rows.length > 0) {
+        req.session.user = user.rows[0];
+        res.redirect('/');
+    } else {
+        res.send('Invalid user ID or password.');
+    }
+});
+
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.send('Error logging out.');
+        }
+        res.redirect('/');
+    });
+});
+
+
+app.post('/submit', async (req, res) => {
+    const { title, body } = req.body;
+    const creator_name = req.session.user.name;
+    const creator_user_id = req.session.user.user_id;
+    await db.query('INSERT INTO blogs (creator_name, creator_user_id, title, body) VALUES ($1, $2, $3, $4)', [creator_name, creator_user_id, title, body]);
     res.redirect('/');
-
-    console.log("Post updated. Post ID: " + postId);
 });
 
-app.get('/delete/:id', (req, res) => {
+app.get('/edit/:id', async (req, res) => {
     const postId = req.params.id;
-    blogPosts = blogPosts.filter(post => post.id != postId); // Stack Overflow solution (ECMA-262 Edition 5 code AKA old style JavaScript)
-    res.redirect('/');
+    const result = await db.query('SELECT * FROM blogs WHERE blog_id = $1', [postId]);
+    const post = result.rows[0];
+    const user = req.session.user;
+    if (req.session.user.user_id === post.creator_user_id) {
+        res.render('edit', { post });
+    } else {
+        res.send('Unauthorized');
+    }
+});
 
-    console.log("Post deleted. Post ID: " + postId);
+
+app.post('/edit/:id', async (req, res) => {
+    const postId = req.params.id;
+    const { title, body } = req.body;
+    await db.query('UPDATE blogs SET title = $1, body = $2 WHERE blog_id = $3', [title, body, postId]);
+    res.redirect('/');
+});
+
+
+app.get('/delete/:id', async (req, res) => {
+    const postId = req.params.id;
+    const result = await db.query('SELECT * FROM blogs WHERE blog_id = $1', [postId]);
+    const post = result.rows[0];
+    if (req.session.user.user_id === post.creator_user_id) {
+        await db.query('DELETE FROM blogs WHERE blog_id = $1', [postId]);
+        res.redirect('/');
+    } else {
+        res.send('Unauthorized');
+    }
 });
 
 

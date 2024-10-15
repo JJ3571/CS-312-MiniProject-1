@@ -3,49 +3,50 @@
 <head>
     <title>Jarred's Blog</title>
     <link rel="stylesheet" href="style.css">
-    <title>CS312 MiniProjet 1 - Blog</title>
+    <title>CS312 - Blog & Databases</title>
 <body>
-    <header>
-        <h1>Welcome to Jarred's Blog</h1>
-        <nav>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/about">Find a Friend</a></li>
-            </ul>
-        </nav>
-    </header>
+ <div class="container">
+        <header class="d-flex justify-content-between align-items-center my-4">
+            <h1>CS312 - Blog & Databases</h1>
+            <div>
+                <% if (user) { %>
+                    <span>Welcome, <%= user.name %>!</span>
+                    <a href="/logout" class="btn btn-outline-danger ml-2">Logout</a>
+                <% } else { %>
+                    <a href="/signin" class="btn btn-outline-primary">Login</a>
+                    <a href="/signup" class="btn btn-outline-secondary ml-2">Sign Up</a>
+                <% } %>
+            </div>
+        </header>
 
-        <form action="/submit" method="POST">
-            <input type="text" name="title" placeholder="Title">
-            <select name="category" id="category" placeholder="category">
-                <option value="Life">Life</option>
-                <option value="Tech">Tech</option>
-                <option value="Food">Food</option>
-                <option value="Travel">Travel</option>
-                <option value="Sports">Sports</option>
-            </select>
-            <textarea name="content" placeholder="Content"></textarea>
-            <button type="submit">Submit</button>
-        </form>
-
-
-    <% blogPosts.forEach(post => { %>
-        <div class="blog-post">
-            <h2><%= post.title %></h2>
-            <h4><%= post.date %></h4>
-            <h4>Category: <%= post.category %></h4>
-            <p><%- post.content.replace(/\n/g, "<br>") %></p>
-            <form action="/edit/<%= post.id %>" method="GET">
-                <button type="submit">Edit Post</button>
+        <div>
+            <form action="/submit" method="POST">
+                <input type="text" name="title" placeholder="Title" required>
+                <textarea name="body" placeholder="Body" required></textarea>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </form>
-            <form action="/delete/<%= post.id %>" method="GET">
-                <button type="submit">Delete Post</button>
         </div>
-    <% }); %>
+
+        <div class="mt-4">
+            <% blogPosts.forEach(post => { %>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h2 class="card-title"><%= post.title %></h2>
+                        <p class="card-text"><%= post.body %></p>
+                        <p class="card-text"><small class="text-muted">By: <%= post.creator_name %> on <%= post.date_created %></p>
+                        <% if (user && user.user_id === post.creator_user_id) { %>
+                            <a href="/edit/<%= post.blog_id %>" class="btn btn-outline-warning">Edit</a>
+                            <a href="/delete/<%= post.blog_id %>" class="btn btn-outline-danger">Delete</a>
+                        <% } %>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
 
 
     <footer></footer>
-        <p> Jarred Dunlap&trade; <br>CS312 - MiniProject 1</p>
+        <p> Jarred Dunlap&trade; <br>CS312 - MiniProject 3</p>
     </footer>
 </body>
 </html>
