@@ -5,10 +5,9 @@ import express from "express";
 import session from "express-session";
 import morgan from "morgan";
 import { dirname } from "path";
-import pg from "pg";
 import { fileURLToPath } from "url";
-
-
+import pg from "pg";
+import bcrypt from "bcrypt"
 
 // --- Express Setup ---
 const app = express();
@@ -23,7 +22,7 @@ app.use(bodyparser.urlencoded({ extended: true }));
 app.use(morgan("tiny"));
 dotenv.config();
 const DB_PASSWORD = process.env.DB_PASSWORD;
-
+const saltRounds = 10;
 
 
 // --- Sessions for user auth ---
@@ -69,12 +68,23 @@ app.get('/signup', (req, res) => {
 
 app.post('/signup', async (req, res) => {
     const { user_id, password, name } = req.body;
-    const userExists = await db.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
-    if (userExists.rows.length > 0) {
-        res.send('User ID already taken. Please choose another.');
-    } else {
-        await db.query('INSERT INTO users (user_id, password, name) VALUES ($1, $2, $3)', [user_id, password, name]);
-        res.redirect('/signin');
+    try {
+        const userExists = await db.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
+        if (userExists.rows.length > 0) {
+            res.send('Email already taken. Please choose another.');
+        } else {
+            // added Hashing
+            bcrypt.hash(password, saltRounds, async (err, hash) => {
+                if (err) {
+                    return res.send('Error hashing password.');
+                } else {
+                await db.query('INSERT INTO users (user_id, password, name) VALUES ($1, $2, $3)', [user_id, hash, name]);
+                res.redirect('/signin');
+                }
+            });
+        }
+    } catch (err) {
+    console.log(err);
     }
 });
 
@@ -84,12 +94,29 @@ app.get('/signin', (req, res) => {
 
 app.post('/signin', async (req, res) => {
     const { user_id, password } = req.body;
-    const user = await db.query('SELECT * FROM users WHERE user_id = $1 AND password = $2', [user_id, password]);
-    if (user.rows.length > 0) {
-        req.session.user = user.rows[0];
-        res.redirect('/');
-    } else {
-        res.send('Invalid user ID or password.');
+    
+    try {
+        const result = await db.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
+        if (result.rows.length === 0) {
+            return res.send('Invalid user ID or password.');
+        }
+
+        const user = result.rows[0];
+        const storedHashedPassword = user.password;
+
+        bcrypt.compare(password, storedHashedPassword, (err, isMatch) => {
+            if (err) {
+                return res.send('Error comparing passwords.');
+            }
+            if (isMatch) {
+                req.session.user = user;
+                res.redirect('/');
+            } else {
+                res.send('Invalid user ID or password.');
+            }
+        });
+    } catch (error) {
+        res.send('Error querying the database.');
     }
 });
 
@@ -140,25 +167,6 @@ app.get('/delete/:id', async (req, res) => {
         res.send('Unauthorized');
     }
 });
-
-
-
-// --- Blog Post Handling ---
-let blogPosts = []
-let blogPostCounter = 0;
-
-function addToBlogArray(req, res) {
-    const newPost = {
-        title: req.body.title,
-        date: new Date().toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }).replace(/,/g, ''),
-        category: req.body.category,
-        content: req.body.content,
-        id: blogPostCounter++
-    };
-    blogPosts.push(newPost);
-    res.redirect('/')
-};
-
 
 
 // --- Server Start ---
