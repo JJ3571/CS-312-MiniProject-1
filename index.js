@@ -21,13 +21,14 @@ app.use(express.static(__dirname + '/public'));
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(morgan("tiny"));
 dotenv.config();
+const SESSION_SECRET = process.env.SESSION_SECRET;
 const DB_PASSWORD = process.env.DB_PASSWORD;
 const saltRounds = 10;
 
 
 // --- Sessions for user auth ---
 app.use(session({
-    secret: 'apAPS*RcU^o2MjonW%9i', 
+    secret: SESSION_SECRET, 
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false }
