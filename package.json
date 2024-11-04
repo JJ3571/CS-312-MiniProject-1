@@ -16,6 +16,7 @@
     "tailwindcss": "^3.4.10"
   },
   "dependencies": {
+    "bcrpyt": "^2.0.0",
     "body-parser": "^1.20.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
